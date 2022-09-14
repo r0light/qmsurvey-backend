@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="icon" th:href="@{/favicon.ico}" />
+    <title th:text="${survey.comment}"></title>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-utilities.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-icons.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/core.css}"/>
+    <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+</head>
+<body>
+<div th:replace="header :: header">&nbsp;</div>
+<!-- /* Handle the flash message */-->
+<th:block th:if="${message != null}">
+    <!-- /* The message code is returned from the @Controller */ -->
+    <div th:replace="alert :: alert (type=${#strings.toLowerCase(message.type)}, message=#{${message.message}(${#authentication.name})})">
+        &nbsp;
+    </div>
+</th:block>
+
+
+<div class="container-md">
+    <div class="md-12 d-flex flex-row flex-wrap justify-content-start mb-3">
+        <form class="form-group m-2" id="back" th:action="@{/admin/}" method="get">
+            <button class="btn btn-primary" type="submit">Go Back</button>
+        </form>
+        <form class="form-group m-2" id="export" th:action="@{/admin/{surveyId}/json(surveyId=${survey.id})}"
+              method="get">
+            <button class="btn btn-primary" type="submit">Export JSON</button>
+        </form>
+    </div>
+    <div class="row md-12 mt-5 justify-content-start">
+        <h3>Survey Details</h3>
+    </div>
+    <div class="row my-2 py-2 border-bottom text-break">
+        <div class="col-md-3">
+            <span class="fw-bold">Id</span><br/>
+            <span th:text="${survey.id}"></span>
+        </div>
+        <div class="col-md-2">
+            <span class="fw-bold">Token</span><br/>
+            <span th:text="${survey.token}"></span>
+        </div>
+        <div class="col-md-2">
+            <span class="fw-bold">Start time</span><br/>
+            <span th:text="${survey.startTime}"></span>
+        </div>
+        <div class="col-md-2">
+            <span class="fw-bold">Comment</span><br/>
+            <span th:text="${survey.comment}"></span>
+        </div>
+        <div class="col-md-1">
+            <span class="fw-bold">Pilot?</span><br/>
+            <span th:text="${survey.pilot}"></span>
+        </div>
+        <div class="col-md-2">
+            <span class="fw-bold">Active</span><br/>
+            <span th:text="${survey.active}"></span>
+        </div>
+    </div>
+    <div class="row md-12 mt-5 justify-content-start">
+        <h3>Submits</h3>
+    </div>
+    <div class="row my-2 py-2 border-bottom">
+        <div class="col-md-4">
+            Session Id
+        </div>
+        <div class="col-md-4">
+            Start time
+        </div>
+        <div class="col-md-4">
+            Cient start time
+        </div>
+    </div>
+    <div th:each="submit : ${submits}" class="text-break">
+        <div class="row py-2">
+            <div class="col-md-4 py-2 survey-attr">
+                <div th:text="${submit.sessionId}"></div>
+            </div>
+            <div class="col-md-4 py-2 survey-attr">
+                <div th:text="${submit.startTime}"></div>
+            </div>
+            <div class="col-md-4 py-2 survey-attr">
+                <div th:text="${submit.clientStartTime}"></div>
+            </div>
+        </div>
+        <div class="row py-2 ">
+            <div class="col-md-6">
+                <details>
+                    <summary>Answers (<span th:text="${submit.factors.size}"></span>)</summary>
+                    <ul>
+                        <li class="mt-2" th:each="factorEntry : ${submit.factors}">
+                            <div th:text="${factorEntry.value.factorName}"></div>
+                            <details>
+                                <summary>Impacts</summary>
+                                <div th:each="impactEntry : ${factorEntry.value.impacts}"
+                                     th:if="${impactEntry.value.rating} != 0">
+                                    <div>
+                                        <span th:text="${impactEntry.key}"></span>: <span
+                                            th:text="${impactEntry.value.rating}"></span>
+                                    </div>
+                                </div>
+                            </details>
+                        </li>
+                    </ul>
+                </details>
+            </div>
+            <div class="col-md-4">
+                <details>
+                    <summary>Demographics</summary>
+                    <p>Job Area: <span th:text="${submit.demographics.jobArea}"></span></p>
+                    <p>Job Title: <span th:text="${submit.demographics.jobTitle}"></span></p>
+                    <p>Company Sector: <span th:text="${submit.demographics.companySector}"></span></p>
+                    <p>General Experience: <span th:text="${submit.demographics.generalExperience}"></span>
+                    </p>
+                    <p>Cloud Experience: <span th:text="${submit.demographics.cloudExperience}"></span></p>
+                </details>
+            </div>
+
+        </div>
+        <div class="row py-2 border-bottom" th:if="${survey.pilot}">
+            <div class="col-md-8">
+                <details>
+                    <summary>Pilot Feedback</summary>
+                    <p>Technical Feedback: <span th:text="${submit.pilotFeedback.technicalFeedback}"></span></p>
+                    <p>Length Feedback: <span th:text="${submit.pilotFeedback.lengthFeedback}"></span></p>
+                    <p>Content Feedback: <span th:text="${submit.pilotFeedback.contentFeedback}"></span></p>
+                    <details>
+                        <summary>Factor Feedback</summary>
+                        <ul>
+                            <li class="mt-2" th:each="factorFeedback : ${submit.pilotFeedback.factorFeedback}">
+                                <span th:text="${factorFeedback.value.name}"></span>: <span
+                                    th:text="${factorFeedback.value.feedback}"></span>
+                            </li>
+                        </ul>
+                    </details>
+                    <p>Email : <span th:text="${submit.pilotFeedback.email}"></span></p>
+                </details>
+            </div>
+        </div>
+    </div>
+    <div class="row md-12">
+        <p th:if="${survey.submits.empty}">No submits available!</p>
+    </div>
+    <div class="row md-12 mt-5 justify-content-start" th:if="${!survey.pilot}">
+        <h3>Contacts</h3>
+    </div>
+    <div class="row my-2 py-2 border-bottom" th:if="${!survey.pilot}">
+        <div class="col-md-4">
+            Email
+        </div>
+    </div>
+    <div class="text-break" th:each="contact : ${contacts}" th:if="${!survey.pilot}">
+        <div class="row py-1">
+            <div class="col-md-4 py-1 survey-attr">
+                <div th:text="${contact.email}"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row md-12" >
+        <p th:if="${!survey.pilot && contacts.empty}">No contacts available!</p>
+    </div>
+</div>
+</body>
+
+</html>

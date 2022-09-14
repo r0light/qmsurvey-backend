@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="icon" th:href="@{/favicon.ico}" />
+    <title>QM Validation Surveys</title>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-utilities.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-icons.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/core.css}"  />
+    <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+</head>
+<body>
+<div class="container-md">
+    <div class="d-flex flex-row justify-content-center">
+        <div class="d-flex flex-column justify-content-center align-items-center mt-3" th:switch="${status}">
+            <h2 th:case="404">404: There is nothing here.</h2>
+            <h2 th:case="400">400: This did not work. Please check your request.</h2>
+            <h2 th:case="500">500: Sorry, something went wrong. Please try again later.</h2>
+            <h2 th:case="null">Something went wrong...</h2>
+            <h2 th:case="*"><span th:text="${status + ' ' + error}"></span></h2>
+            <p th:text="${message}"></p>
+        </div>
+    </div>
+</div>
+
+
+</body>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="icon" th:href="@{/favicon.ico}" />
+    <title>QM Validation Surveys</title>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-utilities.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-icons.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/core.css}"/>
+    <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+</head>
+<body>
+<div th:replace="header :: header">&nbsp;</div>
+<!-- /* Handle the flash message */-->
+<th:block th:if="${message != null}">
+    <!-- /* The message code is returned from the @Controller */ -->
+    <div th:replace="alert :: alert (type=${#strings.toLowerCase(message.type)}, message=#{${message.message}(${#authentication.name})})">
+        &nbsp;
+    </div>
+</th:block>
+
+<div class="container-md">
+    <div class="row md-12 justify-content-end">
+        <div class="col-md-8">
+            <form class="form-group row" id="addSurvey" th:action="@{/admin/addSurvey}" th:object="${addSurveyForm}"
+                  method="post">
+                <label class="col-md-2 col-form-label" for="comment">Comment:</label>
+                <div class="col-md-5">
+                    <input class="form-control" id="comment" type="text" th:field="*{comment}">
+                </div>
+                <label class="col-md-1 col-form-label form-check-label" for="pilot">Pilot?</label>
+                <div class="col-md-1">
+                    <input class="form-check-input align-middle" id="pilot" type="checkbox" th:field="*{pilot}"
+                           th:value="*{pilot}">
+                </div>
+                <button class="btn btn-primary col-md-2" name="addSurvey" type="submit">Add</button>
+            </form>
+        </div>
+    </div>
+    <div class="row my-2 py-2 border-bottom">
+        <div class="col-md-2">
+            Token
+        </div>
+        <div class="col-md-2">
+            Start time
+        </div>
+        <div class="col-md-2">
+            Comment
+        </div>
+        <div class="col-md-1">
+            Active
+        </div>
+        <div class="col-md-1">
+            Pilot?
+        </div>
+        <div class="col-md-2">
+            Details
+        </div>
+        <div class="col-md-2">
+            Delete
+        </div>
+    </div>
+    <div th:each="survey : ${surveys}">
+        <div class="row py-2 border-bottom">
+            <div class="col-md-2 py-2 survey-attr">
+                <div class="row">
+                    <div class="col-12" th:text="${survey.token}"></div>
+                    <div class="col-12" ><a th:href="@{~/?survey={token}(token=${survey.token})}">Link</a></div>
+                </div>
+            </div>
+            <div class="col-md-2 py-2 survey-attr">
+                <div th:text="${survey.startTime}"></div>
+            </div>
+            <div class="col-md-2 py-2 survey-attr">
+                <div th:text="${survey.comment}"></div>
+            </div>
+            <div class="col-md-1 py-2 survey-attr">
+                <form id="changeActive" th:action="@{/admin/}" method="get">
+                    <div th:if="${survey.active}">
+                        <i class="bi bi-play-fill" aria-hidden="true"></i>
+                        <button class="btn btn-primary" name="changeActive" th:value="${survey.id}" type="submit">Stop
+                        </button>
+                    </div>
+                    <div th:if="${!survey.active}">
+                        <i class="bi bi-pause-fill" aria-hidden="true"></i>
+                        <button class="btn btn-primary" name="changeActive" th:value="${survey.id}" type="submit">
+                            Start
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-1 py-2 survey-attr">
+                <div th:if="${survey.pilot}">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                </div>
+                <div th:if="${!survey.pilot}">
+                    <i class="bi bi-x-circle-fill" aria-hidden="true"></i>
+                </div>
+            </div>
+            <div class="col-md-2 py-2 survey-attr">
+                <form id="details" th:action="@{/admin/{surveyId}(surveyId=${survey.id})}" method="get">
+                    <button class="btn btn-primary" type="submit">View submits</button>
+                </form>
+            </div>
+            <div class="col-md-2 py-2 survey-attr">
+                <form id="delete" th:action="@{/admin/deleteSurvey}" method="get">
+                    <button class="btn btn-danger" name="delete" th:value="${survey.id}" type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row md-12">
+        <p th:if="${surveys.empty}">No surveys available!</p>
+    </div>
+</div>
+</body>
+<script>
+
+
+</script>
+
+</html>

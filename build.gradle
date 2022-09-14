@@ -1,0 +1,44 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.3'
+	id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+	id 'java'
+}
+
+group = 'de.uniba.dsg.cna'
+version = '0.2.0'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.4.9'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.11'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+	implementation 'org.springframework.boot:spring-boot-starter-json'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+//needed for live reload?
+bootRun {
+	sourceResources sourceSets.main
+	standardInput = System.in
+}
+
+tasks.named("bootBuildImage") {
+	imageName = "uniba-dsg/${project.name}-backend:${project.version}"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

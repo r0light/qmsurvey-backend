@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet" media="screen" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-utilities.min.css}"/>
+    <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-icons.css}"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark" th:fragment="header">
+    <div class="container-md">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/admin}">Surveys</a>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto">
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="nav-item" th:if="${#authorization.expression('!isAuthenticated()')}">
+                    <a class="nav-link" href="/admin/signin" th:href="@{/admin/signin}">
+                        <i class="bi bi-arrow-right-circle" aria-hidden="true"></i> Sign in
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" href="/admin/logout" th:href="@{#}" onclick="$('#form').submit();">
+                        <i class="bi bi-arrow-left-circle" aria-hidden="true"></i> Logout
+                    </a>
+                    <form style="visibility: hidden" id="form" method="post" action="#" th:action="@{/admin/logout}"></form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
