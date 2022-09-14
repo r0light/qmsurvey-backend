@@ -36,7 +36,7 @@ bootRun {
 }
 
 tasks.named("bootBuildImage") {
-	imageName = "uniba-dsg/${project.name}-backend:${project.version}"
+	imageName = "rlight/${project.name}:${project.version}"
 }
 
 tasks.named('test') {
