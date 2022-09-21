@@ -41,3 +41,23 @@ body {
     color: #000;
     text-decoration: none;
 }
+
+.checklist {
+    list-style: none;
+}
+
+.inputDisplayField {
+    display: contents;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    width: auto;
+    background-color: inherit;
+    width: fit-content;
+}
+
+
+.inputDisplayField:focus-visible {
+    outline: none;
+}

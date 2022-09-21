@@ -20,6 +20,9 @@ public class SubmitDto {
 
     private boolean pilot;
 
+    public SubmitDto() {
+    }
+
     public SubmitDto(String token, String sessionId, LocalDateTime clientStartTime, boolean isPilot) {
         this.token = token;
         this.sessionId = sessionId;

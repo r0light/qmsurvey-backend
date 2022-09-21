@@ -13,20 +13,23 @@ public class SurveyAttributes {
     private String token;
     private boolean pilot;
 
+    private boolean selected;
+
     public SurveyAttributes() {
     }
 
-    public SurveyAttributes(String id, LocalDateTime startTime, String comment, boolean active, String token, boolean pilot) {
+    public SurveyAttributes(String id, LocalDateTime startTime, String comment, boolean active, String token, boolean pilot, boolean selected) {
         this.id = id;
         this.startTime = startTime;
         this.comment = comment;
         this.active = active;
         this.token = token;
         this.pilot = pilot;
+        this.selected = selected;
     }
 
     public static SurveyAttributes of(Survey survey) {
-        return new SurveyAttributes(survey.getId(), survey.getStartTime(), survey.getComment(), survey.isActive(), survey.getToken(), survey.isPilot());
+        return new SurveyAttributes(survey.getId(), survey.getStartTime(), survey.getComment(), survey.isActive(), survey.getToken(), survey.isPilot(), false);
     }
 
     public String getId() {
@@ -75,5 +78,26 @@ public class SurveyAttributes {
 
     public void setPilot(boolean pilot) {
         this.pilot = pilot;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    @Override
+    public String toString() {
+        return "SurveyAttributes{" +
+                "id='" + id + '\'' +
+                ", startTime=" + startTime +
+                ", comment='" + comment + '\'' +
+                ", active=" + active +
+                ", token='" + token + '\'' +
+                ", pilot=" + pilot +
+                ", selected=" + selected +
+                '}';
     }
 }

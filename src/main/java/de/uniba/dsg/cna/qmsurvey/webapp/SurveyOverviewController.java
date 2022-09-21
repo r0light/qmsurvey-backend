@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("admin")
@@ -31,7 +32,7 @@ public class SurveyOverviewController {
     @GetMapping("/")
     public String home(Model model) {
 
-        List<Survey> surveys = surveyService.loadAllSurveys();
+        List<SurveyAttributes> surveys = surveyService.loadAllSurveys().stream().map(survey -> SurveyAttributes.of(survey)).collect(Collectors.toList());
         model.addAttribute("surveys", surveys);
 
         AddSurveyForm addSurveyForm = new AddSurveyForm();

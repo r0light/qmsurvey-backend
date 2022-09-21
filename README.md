@@ -18,6 +18,8 @@ The application will be available at `localhost:8080/backend/admin`.
 
 To properly shutdown the application while using `bootRun`, type `stop` in the console and hit `Enter`.
 
+To reload the app while running, use `CTRL + F9` to rebuild the project.
+
 ## Run in production
 
 Start a mongoDB database with docker, for example:

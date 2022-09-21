@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <link rel="icon" th:href="@{/favicon.ico}" />
+  <title>QM Validation Surveys</title>
+  <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap.min.css}"/>
+  <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-utilities.min.css}"/>
+  <link rel="stylesheet" media="screen" th:href="@{/css/bootstrap-icons.css}"/>
+  <link rel="stylesheet" media="screen" th:href="@{/css/core.css}"/>
+  <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+</head>
+
+<body>
+<div th:replace="header :: header">&nbsp;</div>
+<!-- /* Handle the flash message */-->
+<th:block th:if="${message != null}">
+  <!-- /* The message code is returned from the @Controller */ -->
+  <div th:replace="alert :: alert (type=${#strings.toLowerCase(message.type)}, message=#{${message.message}(${#authentication.name})})">
+    &nbsp;
+  </div>
+</th:block>
+
+<div class="container-md">
+  <form id="report" th:action="@{/admin/analysis/report}" th:object="${selectionWrapper}"
+        method="post">
+  <div class="md-12 d-flex flex-row flex-wrap justify-content-start mb-3">
+      <button class="btn btn-primary" type="submit">Generate Report</button>
+  </div>
+  <div class="row md-12 mt-5 justify-content-start border-bottom">
+    <h3>Surveys</h3>
+    <ul class="checklist">
+      <li th:each="survey, stat : ${selectionWrapper.surveys}">
+        <input class="form-check-input" type="checkbox" th:field="*{surveys[__${stat.index}__].selected}" th:checked="${survey.selected}" id="flexCheckChecked">
+        <input type="hidden" th:value="${survey.id}" th:field="*{surveys[__${stat.index}__].id}" />
+        <input type="hidden" th:value="${survey.token}" th:field="*{surveys[__${stat.index}__].token}" />
+        <input type="hidden" th:value="${survey.startTime}"  th:field="*{surveys[__${stat.index}__].startTime}" />
+        <input type="hidden" th:value="${survey.comment}" th:field="*{surveys[__${stat.index}__].comment}" />
+        <input type="hidden" th:value="${survey.active}" th:field="*{surveys[__${stat.index}__].active}" />
+        <span th:text="${survey.token}"></span>, <span th:text="${survey.startTime}"></span>, <span th:text="${survey.comment}"></span>,
+        <span th:if="${survey.active}">active</span><span  th:if="${!survey.active}">inactive</span>
+      </li>
+    </ul>
+    </div>
+  </form>
+
+</div>
+
+</body>
+</html>
