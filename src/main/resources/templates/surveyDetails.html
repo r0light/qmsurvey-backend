@@ -75,7 +75,7 @@
             Cient start time
         </div>
     </div>
-    <div th:each="submit : ${submits}" class="text-break">
+    <div th:each="submit : ${submitsPage.content}" class="text-break">
         <div class="row py-2">
             <div class="col-md-4 py-2 survey-attr">
                 <div th:text="${submit.sessionId}"></div>
@@ -142,8 +142,20 @@
             </div>
         </div>
     </div>
+
     <div class="row md-12">
-        <p th:if="${survey.submits.empty}">No submits available!</p>
+        <p th:if="${submitsPage.content.empty}">No submits available!</p>
+    </div>
+    <div class="row my-1 border-bottom">
+    </div>
+    <div class="row p-2 md-12">
+        <div class="pagination">
+            <div th:if="${submitsPage.totalPages > 0}" class="page-item" th:classappend="${pageNumber==submitsPage.number + 1} ? active"
+                 th:each="pageNumber : ${pageNumbers}">
+                <a class="page-link" th:href="@{/admin/{surveyId}(surveyId=${survey.id}, size=${submitsPage.size}, page=${pageNumber})}"
+                   th:text=${pageNumber}></a>
+            </div>
+        </div>
     </div>
     <div class="row md-12 mt-5 justify-content-start" th:if="${!survey.pilot}">
         <h3>Contacts</h3>

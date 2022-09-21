@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import de.uniba.dsg.cna.qmsurvey.application.entities.Submit;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.awt.print.Book;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Survey {
@@ -114,6 +116,26 @@ public class Survey {
         // order submits by start time so that the earliest is first
         List<Submit> orderedSubmits = submits.entrySet().stream().map(entry -> entry.getValue()).sorted(Comparator.comparing(Submit::getStartTime)).collect(Collectors.toList());
         return orderedSubmits;
+    }
+
+    public Page<Submit> getSubmitsPage(Pageable pageable) {
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Submit> allSubmits = getSubmitsChronologically();
+        List<Submit> submitsOnPage;
+
+        if (allSubmits.size() < startItem) {
+            submitsOnPage = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, allSubmits.size());
+            submitsOnPage = allSubmits.subList(startItem, toIndex);
+        }
+
+        Page<Submit> submitsPage
+                = new PageImpl<Submit>(submitsOnPage, PageRequest.of(currentPage, pageSize), allSubmits.size());
+
+        return submitsPage;
     }
 
     public JsonRepresentation toJsonFile() throws JsonProcessingException {
