@@ -31,4 +31,11 @@ public class FactorResult {
     public void setRatings(Map<String, List<Integer>> ratings) {
         this.ratings = ratings;
     }
+
+    public boolean ratingsAreAllZeroForAspect(String aspectKey){
+        if (ratings.containsKey(aspectKey)) {
+            return ratings.get(aspectKey).stream().filter(rating -> rating != 0).count() == 0;
+        }
+        return false;
+    }
 }

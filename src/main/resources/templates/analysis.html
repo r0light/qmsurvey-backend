@@ -10,6 +10,7 @@
   <link rel="stylesheet" media="screen" th:href="@{/css/core.css}"/>
   <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
   <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/chart.min.js}"></script>
 </head>
 
 <body>
@@ -50,18 +51,63 @@
   <div class="md-12 row">
     <h3>Results</h3>
   </div>
+  <div class="md-12" th:if="${factorData.empty}">
+    <p>No data yet</p>
+  </div>
   <div class="md-12">
-    <div th:each="factorResult : ${factorResults}">
-      <span th:text="${factorResult.factorKey}"></span>
-      <div class="p-2">
-        <div th:each="aspectRating : ${factorResult.ratings}">
-          <span th:text="${aspectRating.key}"></span>: <span th:each="rating: ${aspectRating.value}"><span th:text="${rating}"></span>,</span>
+    <div th:each="factorData : ${factorData}">
+      <span th:text="${factorData.factorKey}"></span>
+      <div class="p-2 d-flex flex-row flex-wrap">
+        <div th:each="aspectRating : ${factorData.chartData}" class="d-flex flex-column">
+          <div>
+          <span th:text="${aspectRating.aspectKey}"></span>: <span th:each="rating: ${aspectRating.frequencies}"><span th:text="${rating}"></span>,</span>
+          </div>
+          <div class="ratingHistogram"><canvas th:id="${factorData.factorKey} + '-' + ${aspectRating.aspectKey}" width="400" height="400"></canvas></div>
+
         </div>
       </div>
     </div>
   </div>
 
 </div>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+
+  var factorData = /*[[${factorData}]]*/;
+
+  factorData.forEach(function (factor) {
+    factor.chartData.forEach(function (qualityAspect) {
+      var elementId = factor.factorKey + "-" +  qualityAspect.aspectKey;
+      var ratingChart = document.getElementById(elementId);
+      var myChart = new Chart(ratingChart, {
+        type: 'bar',
+        data: {
+          labels: qualityAspect.labels,
+          datasets: [{
+            label: 'Ratings',
+            data: qualityAspect.frequencies,
+            backgroundColor: 'green',
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: {
+              beginAtZero: true,
+              position: 'bottom'
+            },
+            y: {
+              beginAtZero: true
+            }
+          }
+       }
+      });
+    });
+  });
+
+  /*]]>*/
+</script>
 
 </body>
 </html>

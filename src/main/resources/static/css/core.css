@@ -61,3 +61,7 @@ body {
 .inputDisplayField:focus-visible {
     outline: none;
 }
+
+.ratingHistogram {
+    width: 200px;
+}

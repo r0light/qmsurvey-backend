@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +43,7 @@ public class AnalysisController {
             List<SurveyAttributes> surveys = allSurveys.stream().map(SurveyAttributes::of).toList();
             model.addAttribute("selectionWrapper", new SurveySelectionWrapper(surveys));
             model.addAttribute("factorResults", List.of());
+            model.addAttribute("factorData", List.of());
 
             return "analysis";
         }
@@ -54,6 +57,20 @@ public class AnalysisController {
 
             List<FactorResult> factorResults = analysisService.summarizeFactorResults(flatRatings);
             model.addAttribute("factorResults", factorResults);
+
+            List<FactorChartDataWrapper> factorData = factorResults.stream().map(factorResult -> {
+                List<QualityAspectChartData> qualityAspectChartData = new ArrayList<>();
+                factorResult.getRatings().entrySet().stream().forEach(entry -> {
+                    Integer[] frequencies = {0,0,0,0,0};
+                    for (int rating : entry.getValue()) {
+                        frequencies[rating + 2] = frequencies[rating + 2] + 1;
+                    }
+                    qualityAspectChartData.add(new QualityAspectChartData(entry.getKey(), Arrays.asList(frequencies)));
+                });
+                return new FactorChartDataWrapper(factorResult.getFactorKey(), qualityAspectChartData);
+            }).toList();
+
+            model.addAttribute("factorData", factorData);
 
             return "analysis";
         }

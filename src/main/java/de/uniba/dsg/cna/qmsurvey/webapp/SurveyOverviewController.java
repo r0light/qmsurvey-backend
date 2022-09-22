@@ -42,7 +42,6 @@ public class SurveyOverviewController {
     }
     @PostMapping("/addSurvey")
     public ModelAndView addSurvey(@ModelAttribute AddSurveyForm addSurveyForm) {
-        System.out.println(addSurveyForm.getComment());
         surveyService.startNewSurvey(addSurveyForm.getComment(), addSurveyForm.isPilot());
         return new ModelAndView("redirect:/admin/");
     }

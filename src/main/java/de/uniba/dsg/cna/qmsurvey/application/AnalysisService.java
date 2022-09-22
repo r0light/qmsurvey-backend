@@ -59,6 +59,7 @@ public class AnalysisService {
 
         List<String> factorKeys = factorRatings.stream().map(FlatFactorRating::getFactorKey).distinct().toList();
 
+        // add all submitted factorRatings to the list of factors
         for (String factorKey : factorKeys) {
             Map<String, List<Integer>> aspectRatings = new HashMap<>();
 
@@ -75,6 +76,15 @@ public class AnalysisService {
                         }
                     });
             factorResults.add(new FactorResult(factorKey, aspectRatings));
+        }
+
+        // remove qualityAspects from factors where all impacts are 0
+        for (FactorResult factorResult : factorResults) {
+            for (String aspectKey: QUALITY_ASPECTS) {
+                if (factorResult.ratingsAreAllZeroForAspect(aspectKey)) {
+                    factorResult.getRatings().remove(aspectKey);
+                }
+            }
         }
 
         return factorResults;
