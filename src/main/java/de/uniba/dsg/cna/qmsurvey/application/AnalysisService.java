@@ -28,6 +28,11 @@ public class AnalysisService {
                 List<Factor> factors = submit.getFactors().values().stream()
                         .sorted(Comparator.comparing(factor -> factor.getEdits().get(0))).toList();
 
+                if (factors.isEmpty()) {
+                    // if no factors have been rated, continue with next submit
+                    continue;
+                }
+
                 LocalDateTime previousEditTime = factors.get(0).getEdits().get(0);
 
                 for (Factor factor : factors) {
@@ -43,6 +48,7 @@ public class AnalysisService {
                     }
                     allFactorRatings.add(new FlatFactorRating(survey.getToken(), sessionId, factor.getFactorKey(), impacts, secondsToAnswer));
                 }
+
             }
         }
         return allFactorRatings;
@@ -51,9 +57,9 @@ public class AnalysisService {
     public List<FactorResult> summarizeFactorResults(List<FlatFactorRating> factorRatings) {
         List<FactorResult> factorResults = new ArrayList<>();
 
-        List<String> factorkeys = factorRatings.stream().map(FlatFactorRating::getFactorKey).distinct().toList();
+        List<String> factorKeys = factorRatings.stream().map(FlatFactorRating::getFactorKey).distinct().toList();
 
-        for (String factorKey : factorkeys) {
+        for (String factorKey : factorKeys) {
             Map<String, List<Integer>> aspectRatings = new HashMap<>();
 
             factorRatings.stream()
@@ -155,7 +161,6 @@ public class AnalysisService {
         return contactEmails;
 
     }
-
 
 
 }
