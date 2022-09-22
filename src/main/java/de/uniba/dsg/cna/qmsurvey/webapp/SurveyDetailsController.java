@@ -67,7 +67,7 @@ public class SurveyDetailsController {
         return "surveyDetails";
     }
 
-    @GetMapping(path = "/{id}/json" , produces= MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}/json" , produces= MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<byte[]> surveyDetailsAsJson(@PathVariable("id") String surveyId, Model model) {
 
         Optional<Survey> survey = surveyService.loadSurveyById(surveyId);

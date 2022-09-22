@@ -1,5 +1,6 @@
 package de.uniba.dsg.cna.qmsurvey.application;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@JsonIgnoreProperties({"submitsChronologically"})
 public class Survey {
 
     private String id;

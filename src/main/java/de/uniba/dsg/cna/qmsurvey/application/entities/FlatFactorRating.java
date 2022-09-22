@@ -4,27 +4,30 @@ import java.util.Map;
 
 public class FlatFactorRating {
 
-    private String surveyId;
+    private String surveyToken;
     private String sessionId;
     private String factorKey;
     private Map<String, Integer> aspectRatings;
 
+    private long secondsToAnswer;
+
     public FlatFactorRating() {
     }
 
-    public FlatFactorRating(String surveyId, String sessionId, String factorKey, Map<String, Integer> aspectRatings) {
-        this.surveyId = surveyId;
+    public FlatFactorRating(String surveyId, String sessionId, String factorKey, Map<String, Integer> aspectRatings, long secondsToAnswer) {
+        this.surveyToken = surveyId;
         this.sessionId = sessionId;
         this.factorKey = factorKey;
         this.aspectRatings = aspectRatings;
+        this.secondsToAnswer = secondsToAnswer;
     }
 
-    public String getSurveyId() {
-        return surveyId;
+    public String getSurveyToken() {
+        return surveyToken;
     }
 
-    public void setSurveyId(String surveyId) {
-        this.surveyId = surveyId;
+    public void setSurveyToken(String surveyToken) {
+        this.surveyToken = surveyToken;
     }
 
     public String getSessionId() {
@@ -51,13 +54,22 @@ public class FlatFactorRating {
         this.aspectRatings = aspectRatings;
     }
 
+    public long getSecondsToAnswer() {
+        return secondsToAnswer;
+    }
+
+    public void setSecondsToAnswer(long secondsToAnswer) {
+        this.secondsToAnswer = secondsToAnswer;
+    }
+
     @Override
     public String toString() {
         return "FlatFactorRating{" +
-                "surveyId='" + surveyId + '\'' +
+                "surveyId='" + surveyToken + '\'' +
                 ", sessionId='" + sessionId + '\'' +
                 ", factorKey='" + factorKey + '\'' +
                 ", aspectRatings=" + aspectRatings +
+                ", secondsToAnswer=" + secondsToAnswer +
                 '}';
     }
 }
