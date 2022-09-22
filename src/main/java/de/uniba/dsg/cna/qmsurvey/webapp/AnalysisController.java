@@ -4,6 +4,7 @@ import de.uniba.dsg.cna.qmsurvey.application.AnalysisService;
 import de.uniba.dsg.cna.qmsurvey.application.Survey;
 import de.uniba.dsg.cna.qmsurvey.application.SurveyService;
 import de.uniba.dsg.cna.qmsurvey.application.entities.FactorResult;
+import de.uniba.dsg.cna.qmsurvey.application.entities.FlatDemographics;
 import de.uniba.dsg.cna.qmsurvey.application.entities.FlatFactorRating;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -16,10 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,7 @@ public class AnalysisController {
 
             List<Survey> allSurveys = surveyService.loadAllSurveys();
 
-            List<SurveyAttributes> surveys = allSurveys.stream().map(survey -> SurveyAttributes.of(survey)).collect(Collectors.toList());
+            List<SurveyAttributes> surveys = allSurveys.stream().map(SurveyAttributes::of).toList();
             model.addAttribute("selectionWrapper", new SurveySelectionWrapper(surveys));
             model.addAttribute("factorResults", List.of());
 
@@ -60,11 +59,11 @@ public class AnalysisController {
         }
 
         @PostMapping(path = "/report", produces= MediaType.TEXT_PLAIN_VALUE, params="action=factorsCsv")
-        public ResponseEntity<byte[]> exportAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
+        public ResponseEntity<byte[]> exportFactorRatingsAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
 
             List<FlatFactorRating> flatRatings = getFactorRatingsForSurveys(selectionWrapper.getSurveys());
 
-            List<String> preparedContent = analysisService.convertToCsvFileLines(flatRatings);
+            List<String> preparedContent = analysisService.convertFactorRatingsToCsv(flatRatings);
 
             byte[] fileData = String.join("\n", preparedContent).getBytes(StandardCharsets.UTF_8);
 
@@ -76,10 +75,42 @@ public class AnalysisController {
 
         private List<FlatFactorRating> getFactorRatingsForSurveys(List<SurveyAttributes> surveys) {
             return analysisService.collectAllFactorRatings(surveys.stream()
-                    .filter(survey -> survey.isSelected())
-                    .map(surveyAttributes -> surveyAttributes.getId())
-                    .collect(Collectors.toList())
+                    .filter(SurveyAttributes::isSelected)
+                    .map(SurveyAttributes::getId)
+                    .toList()
             );
         }
+
+    @PostMapping(path = "/report", produces= MediaType.TEXT_PLAIN_VALUE, params="action=demographicsCsv")
+    public ResponseEntity<byte[]> exportDemographicsAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
+
+        List<FlatDemographics> flatDemographics = analysisService.collectAllDemographics(selectionWrapper.getSurveys().stream().filter(SurveyAttributes::isSelected).map(SurveyAttributes::getId)
+                        .toList());
+
+        List<String> preparedContent = analysisService.convertDemographicsToCsv(flatDemographics);
+
+        byte[] fileData = String.join("\n", preparedContent).getBytes(StandardCharsets.UTF_8);
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + "demographicsData" + ".csv")
+                .contentType(MediaType.TEXT_PLAIN)
+                .contentLength(fileData.length)
+                .body(fileData);
+    }
+
+    @PostMapping(path = "/report", produces= MediaType.TEXT_PLAIN_VALUE, params="action=contactsCsv")
+    public ResponseEntity<byte[]> exportContactsAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
+
+        List<String> preparedContent = analysisService.collectContactsAsCsv(selectionWrapper.getSurveys().stream().filter(SurveyAttributes::isSelected).map(SurveyAttributes::getId)
+                .toList());
+
+        byte[] fileData = String.join("\n", preparedContent).getBytes(StandardCharsets.UTF_8);
+
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + "contacts" + ".csv")
+                .contentType(MediaType.TEXT_PLAIN)
+                .contentLength(fileData.length)
+                .body(fileData);
+    }
+
+
 
 }

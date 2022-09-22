@@ -13,6 +13,9 @@ public class ContactDto {
     @NotBlank(message = "The email must be provided.")
     private String email;
 
+    public ContactDto() {
+    }
+
     public ContactDto(String token, String email) {
         this.token = token;
         this.email = email;
