@@ -11,6 +11,7 @@
   <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
   <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
   <script type="text/javascript" th:src="@{/js/chart.min.js}"></script>
+  <script type="text/javascript" th:src="@{/js/sgratzl-chartjs-chart-boxplot.min.js}"></script>
 </head>
 
 <body>
@@ -68,6 +69,12 @@
       </div>
     </div>
   </div>
+  <div class="md-12" th:if="${!answerTimeData.empty}">
+    <p>Boxplot for answer time (in seconds)</p>
+    <div style="width: 500px; height: 500px;">
+      <canvas id="timeDataCanvas"></canvas>
+    </div>
+  </div>
 
 </div>
 
@@ -105,6 +112,45 @@
       });
     });
   });
+
+  var answerTimeData = /*[[${answerTimeData}]]*/;
+  console.log(answerTimeData);
+
+  if (answerTimeData && answerTimeData.length !== 0) {
+    const boxplotData = {
+      // define label tree
+      labels: ['Answer time (seconds)'],
+      datasets: [{
+        label: 'Selected surveys',
+        backgroundColor: 'rgba(255,0,0,0.5)',
+        borderColor: 'red',
+        borderWidth: 1,
+        outlierColor: '#595959',
+        padding: 10,
+        itemRadius: 0,
+        data: [
+          answerTimeData
+        ]
+      }]
+    };
+
+    const ctx = document.getElementById("timeDataCanvas").getContext("2d");
+    window.myBar = new Chart(ctx, {
+      type: 'boxplot',
+      data: boxplotData,
+      options: {
+        responsive: true,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Answer time boxplot (seconds)'
+        }
+      }
+    });
+  }
+
 
   /*]]>*/
 </script>

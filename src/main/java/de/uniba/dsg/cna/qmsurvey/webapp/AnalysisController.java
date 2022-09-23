@@ -22,87 +22,92 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("admin/analysis")
 @EnableWebSecurity
 public class AnalysisController {
 
-        @Autowired
-        private SurveyService surveyService;
+    @Autowired
+    private SurveyService surveyService;
 
-        @Autowired
-        private AnalysisService analysisService;
+    @Autowired
+    private AnalysisService analysisService;
 
-        @GetMapping("/")
-        public String analysis(Model model) {
+    @GetMapping("/")
+    public String analysis(Model model) {
 
-            List<Survey> allSurveys = surveyService.loadAllSurveys();
+        List<Survey> allSurveys = surveyService.loadAllSurveys();
 
-            List<SurveyAttributes> surveys = allSurveys.stream().map(SurveyAttributes::of).toList();
-            model.addAttribute("selectionWrapper", new SurveySelectionWrapper(surveys));
-            model.addAttribute("factorResults", List.of());
-            model.addAttribute("factorData", List.of());
+        List<SurveyAttributes> surveys = allSurveys.stream().map(SurveyAttributes::of).toList();
+        model.addAttribute("selectionWrapper", new SurveySelectionWrapper(surveys));
+        model.addAttribute("factorResults", List.of());
+        model.addAttribute("factorData", List.of());
+        model.addAttribute("answerTimeData", List.of());
 
-            return "analysis";
-        }
+        return "analysis";
+    }
 
-        @PostMapping(path = "/report", params="action=report")
-        public String generateReport(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
+    @PostMapping(path = "/report", params = "action=report")
+    public String generateReport(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
 
-            model.addAttribute("selectionWrapper", selectionWrapper);
+        model.addAttribute("selectionWrapper", selectionWrapper);
 
-            List<FlatFactorRating> flatRatings = getFactorRatingsForSurveys(selectionWrapper.getSurveys());
+        List<FlatFactorRating> flatRatings = getFactorRatingsForSurveys(selectionWrapper.getSurveys());
 
-            List<FactorResult> factorResults = analysisService.summarizeFactorResults(flatRatings);
-            model.addAttribute("factorResults", factorResults);
+        // factor rating results
+        List<FactorResult> factorResults = analysisService.summarizeFactorResults(flatRatings);
+        model.addAttribute("factorResults", factorResults);
 
-            List<FactorChartDataWrapper> factorData = factorResults.stream().map(factorResult -> {
-                List<QualityAspectChartData> qualityAspectChartData = new ArrayList<>();
-                factorResult.getRatings().entrySet().stream().forEach(entry -> {
-                    Integer[] frequencies = {0,0,0,0,0};
-                    for (int rating : entry.getValue()) {
-                        frequencies[rating + 2] = frequencies[rating + 2] + 1;
-                    }
-                    qualityAspectChartData.add(new QualityAspectChartData(entry.getKey(), Arrays.asList(frequencies)));
-                });
-                return new FactorChartDataWrapper(factorResult.getFactorKey(), qualityAspectChartData);
-            }).toList();
+        List<FactorChartDataWrapper> factorData = factorResults.stream().map(factorResult -> {
+            List<QualityAspectChartData> qualityAspectChartData = new ArrayList<>();
+            factorResult.getRatings().entrySet().stream().forEach(entry -> {
+                Integer[] frequencies = {0, 0, 0, 0, 0};
+                for (int rating : entry.getValue()) {
+                    frequencies[rating + 2] = frequencies[rating + 2] + 1;
+                }
+                qualityAspectChartData.add(new QualityAspectChartData(entry.getKey(), Arrays.asList(frequencies)));
+            });
+            return new FactorChartDataWrapper(factorResult.getFactorKey(), qualityAspectChartData);
+        }).toList();
 
-            model.addAttribute("factorData", factorData);
+        model.addAttribute("factorData", factorData);
 
-            return "analysis";
-        }
+        // time to answer data
+        List<Long> answerTimeData = flatRatings.stream().map(FlatFactorRating::getSecondsToAnswer).toList();
+        model.addAttribute("answerTimeData", answerTimeData);
 
-        @PostMapping(path = "/report", produces= MediaType.TEXT_PLAIN_VALUE, params="action=factorsCsv")
-        public ResponseEntity<byte[]> exportFactorRatingsAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
+        return "analysis";
+    }
 
-            List<FlatFactorRating> flatRatings = getFactorRatingsForSurveys(selectionWrapper.getSurveys());
+    @PostMapping(path = "/report", produces = MediaType.TEXT_PLAIN_VALUE, params = "action=factorsCsv")
+    public ResponseEntity<byte[]> exportFactorRatingsAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
 
-            List<String> preparedContent = analysisService.convertFactorRatingsToCsv(flatRatings);
+        List<FlatFactorRating> flatRatings = getFactorRatingsForSurveys(selectionWrapper.getSurveys());
 
-            byte[] fileData = String.join("\n", preparedContent).getBytes(StandardCharsets.UTF_8);
+        List<String> preparedContent = analysisService.convertFactorRatingsToCsv(flatRatings);
 
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + "factorData" + ".csv")
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .contentLength(fileData.length)
-                    .body(fileData);
-        }
+        byte[] fileData = String.join("\n", preparedContent).getBytes(StandardCharsets.UTF_8);
 
-        private List<FlatFactorRating> getFactorRatingsForSurveys(List<SurveyAttributes> surveys) {
-            return analysisService.collectAllFactorRatings(surveys.stream()
-                    .filter(SurveyAttributes::isSelected)
-                    .map(SurveyAttributes::getId)
-                    .toList()
-            );
-        }
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + "factorData" + ".csv")
+                .contentType(MediaType.TEXT_PLAIN)
+                .contentLength(fileData.length)
+                .body(fileData);
+    }
 
-    @PostMapping(path = "/report", produces= MediaType.TEXT_PLAIN_VALUE, params="action=demographicsCsv")
+    private List<FlatFactorRating> getFactorRatingsForSurveys(List<SurveyAttributes> surveys) {
+        return analysisService.collectAllFactorRatings(surveys.stream()
+                .filter(SurveyAttributes::isSelected)
+                .map(SurveyAttributes::getId)
+                .toList()
+        );
+    }
+
+    @PostMapping(path = "/report", produces = MediaType.TEXT_PLAIN_VALUE, params = "action=demographicsCsv")
     public ResponseEntity<byte[]> exportDemographicsAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
 
         List<FlatDemographics> flatDemographics = analysisService.collectAllDemographics(selectionWrapper.getSurveys().stream().filter(SurveyAttributes::isSelected).map(SurveyAttributes::getId)
-                        .toList());
+                .toList());
 
         List<String> preparedContent = analysisService.convertDemographicsToCsv(flatDemographics);
 
@@ -114,7 +119,7 @@ public class AnalysisController {
                 .body(fileData);
     }
 
-    @PostMapping(path = "/report", produces= MediaType.TEXT_PLAIN_VALUE, params="action=contactsCsv")
+    @PostMapping(path = "/report", produces = MediaType.TEXT_PLAIN_VALUE, params = "action=contactsCsv")
     public ResponseEntity<byte[]> exportContactsAsCsv(Model model, @ModelAttribute("selectionWrapper") SurveySelectionWrapper selectionWrapper) {
 
         List<String> preparedContent = analysisService.collectContactsAsCsv(selectionWrapper.getSurveys().stream().filter(SurveyAttributes::isSelected).map(SurveyAttributes::getId)
@@ -127,7 +132,6 @@ public class AnalysisController {
                 .contentLength(fileData.length)
                 .body(fileData);
     }
-
 
 
 }
