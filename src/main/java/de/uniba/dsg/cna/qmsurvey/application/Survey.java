@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@JsonIgnoreProperties({"submitsChronologically"})
+@JsonIgnoreProperties({"submitsChronologically", "getSubmitsPage"})
 public class Survey {
 
     private String id;
@@ -138,6 +138,14 @@ public class Survey {
                 = new PageImpl<Submit>(submitsOnPage, PageRequest.of(currentPage, pageSize), allSubmits.size());
 
         return submitsPage;
+    }
+
+    public int countSubmits() {
+        return submits.entrySet().size();
+    }
+
+    public int countFilledSubmits() {
+        return (int) submits.entrySet().stream().filter(submit -> !submit.getValue().getFactors().isEmpty()).count();
     }
 
     public JsonRepresentation toJsonFile() throws JsonProcessingException {

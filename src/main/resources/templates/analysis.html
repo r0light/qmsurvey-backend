@@ -43,6 +43,8 @@
         <input type="hidden" th:value="${survey.startTime}"  th:field="*{surveys[__${stat.index}__].startTime}" />
         <input type="hidden" th:value="${survey.comment}" th:field="*{surveys[__${stat.index}__].comment}" />
         <input type="hidden" th:value="${survey.active}" th:field="*{surveys[__${stat.index}__].active}" />
+        <input type="hidden" th:value="${survey.noOfSubmits}" th:field="*{surveys[__${stat.index}__].noOfSubmits}" />
+        <input type="hidden" th:value="${survey.noOfFilledSubmits}" th:field="*{surveys[__${stat.index}__].noOfFilledSubmits}" />
         <span th:text="${survey.token}"></span>, <span th:text="${survey.startTime}"></span>, <span th:text="${survey.comment}"></span>,
         <span th:if="${survey.active}">active</span><span  th:if="${!survey.active}">inactive</span>
       </li>

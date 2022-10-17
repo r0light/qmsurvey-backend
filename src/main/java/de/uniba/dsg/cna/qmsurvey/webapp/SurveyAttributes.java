@@ -13,23 +13,29 @@ public class SurveyAttributes {
     private String token;
     private boolean pilot;
 
+    private int noOfSubmits;
+
+    private int noOfFilledSubmits;
+
     private boolean selected;
 
     public SurveyAttributes() {
     }
 
-    public SurveyAttributes(String id, LocalDateTime startTime, String comment, boolean active, String token, boolean pilot, boolean selected) {
+    public SurveyAttributes(String id, LocalDateTime startTime, String comment, boolean active, String token, boolean pilot, int noOfSubmits, int noOfFilledSubmits, boolean selected) {
         this.id = id;
         this.startTime = startTime;
         this.comment = comment;
         this.active = active;
         this.token = token;
         this.pilot = pilot;
+        this.noOfSubmits = noOfSubmits;
+        this.noOfFilledSubmits = noOfFilledSubmits;
         this.selected = selected;
     }
 
     public static SurveyAttributes of(Survey survey) {
-        return new SurveyAttributes(survey.getId(), survey.getStartTime(), survey.getComment(), survey.isActive(), survey.getToken(), survey.isPilot(), false);
+        return new SurveyAttributes(survey.getId(), survey.getStartTime(), survey.getComment(), survey.isActive(), survey.getToken(), survey.isPilot(), survey.countSubmits(), survey.countFilledSubmits(), false);
     }
 
     public String getId() {
@@ -80,6 +86,22 @@ public class SurveyAttributes {
         this.pilot = pilot;
     }
 
+    public int getNoOfSubmits() {
+        return noOfSubmits;
+    }
+
+    public void setNoOfSubmits(int noOfSubmits) {
+        this.noOfSubmits = noOfSubmits;
+    }
+
+    public int getNoOfFilledSubmits() {
+        return noOfFilledSubmits;
+    }
+
+    public void setNoOfFilledSubmits(int noOfFilledSubmits) {
+        this.noOfFilledSubmits = noOfFilledSubmits;
+    }
+
     public boolean isSelected() {
         return selected;
     }
@@ -97,6 +119,8 @@ public class SurveyAttributes {
                 ", active=" + active +
                 ", token='" + token + '\'' +
                 ", pilot=" + pilot +
+                ", noOfSubmits=" + noOfSubmits +
+                ", noOfFilledSubmits=" + noOfFilledSubmits +
                 ", selected=" + selected +
                 '}';
     }
