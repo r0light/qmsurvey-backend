@@ -18,20 +18,23 @@ public class SubmitDto {
     @NotNull(message = "A clientStartTime must be provided.")
     private LocalDateTime clientStartTime;
 
+    private String lastState;
+
     private boolean pilot;
 
     public SubmitDto() {
     }
 
-    public SubmitDto(String token, String sessionId, LocalDateTime clientStartTime, boolean isPilot) {
+    public SubmitDto(String token, String sessionId, LocalDateTime clientStartTime, String lastState, boolean isPilot) {
         this.token = token;
         this.sessionId = sessionId;
         this.clientStartTime = clientStartTime;
+        this.lastState = lastState;
         this.pilot = isPilot;
     }
 
-    static SubmitDto of(String token, String sessionId, LocalDateTime clientStartTime, boolean isPilot) {
-        return new SubmitDto(token, sessionId, clientStartTime, isPilot);
+    static SubmitDto of(String token, String sessionId, LocalDateTime clientStartTime, String lastState, boolean isPilot) {
+        return new SubmitDto(token, sessionId, clientStartTime, lastState, isPilot);
     }
 
     public String getToken() {
@@ -56,6 +59,14 @@ public class SubmitDto {
 
     public void setClientStartTime(LocalDateTime clientStartTime) {
         this.clientStartTime = clientStartTime;
+    }
+
+    public String getLastState() {
+        return lastState;
+    }
+
+    public void setLastState(String lastState) {
+        this.lastState = lastState;
     }
 
     public boolean isPilot() {

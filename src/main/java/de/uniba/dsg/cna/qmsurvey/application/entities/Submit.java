@@ -16,6 +16,10 @@ public class Submit {
     private LocalDateTime startTime;
     @NotNull(message = "A clientStartTime must be provided.")
     private LocalDateTime clientStartTime;
+
+    @NotNull(message = "A state must be provided.")
+    private String lastState;
+
     @NotNull(message = "At least one factor must be provided.")
     private Map< @NotBlank(message = "A factorKey must be provided.") String, @Valid Factor> factors;
     @NotNull
@@ -27,20 +31,22 @@ public class Submit {
     public Submit() {
     }
 
-    public Submit(String sessionId, LocalDateTime startTime, LocalDateTime clientStartTime) {
+    public Submit(String sessionId, LocalDateTime startTime, LocalDateTime clientStartTime, String lastState) {
         this.sessionId = sessionId;
         this.startTime = startTime;
         this.clientStartTime = clientStartTime;
+        this.lastState = lastState;
         this.factors = new HashMap<>();
         this.demographics = new Demographics();
         this.pilotFeedback = new PilotFeedback();
     }
 
-    public Submit(String id, String sessionId, LocalDateTime startTime, LocalDateTime clientStartTime, Map<String, Factor> factors, Demographics demographics, PilotFeedback pilotFeedback) {
+    public Submit(String id, String sessionId, LocalDateTime startTime, LocalDateTime clientStartTime, String lastState, Map<String, Factor> factors, Demographics demographics, PilotFeedback pilotFeedback) {
         this.id = id;
         this.sessionId = sessionId;
         this.startTime = startTime;
         this.clientStartTime = clientStartTime;
+        this.lastState = lastState;
         this.factors = factors;
         this.demographics = demographics;
         this.pilotFeedback = pilotFeedback;
@@ -78,6 +84,14 @@ public class Submit {
         this.clientStartTime = clientStartTime;
     }
 
+    public String getLastState() {
+        return lastState;
+    }
+
+    public void setLastState(String lastState) {
+        this.lastState = lastState;
+    }
+
     public Map<String, Factor> getFactors() {
         return factors;
     }
@@ -109,6 +123,7 @@ public class Submit {
                 ", sessionId='" + sessionId + '\'' +
                 ", startTime=" + startTime +
                 ", clientStartTime=" + clientStartTime +
+                ", lastState='" + lastState + '\'' +
                 ", factors=" + factors +
                 ", demographics=" + demographics +
                 ", pilotFeedback=" + pilotFeedback +

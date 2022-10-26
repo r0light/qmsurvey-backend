@@ -44,7 +44,7 @@ public class SurveyServiceTests {
 
         String someSessionId = "id123";
         Survey survey = surveyService.startNewSurvey("test", false);
-        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now());
+        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now(), "welcome");
 
         Submit savedSubmit = surveyService.initializeSubmit(survey.getToken(), someSessionId, LocalDateTime.now());
 
@@ -54,7 +54,7 @@ public class SurveyServiceTests {
 
     @Test
     public void addSubmitToNonExistingSurveyShouldThrowException() {
-        Submit newSubmit = new Submit("someSessionId", LocalDateTime.now(), LocalDateTime.now());
+        Submit newSubmit = new Submit("someSessionId", LocalDateTime.now(), LocalDateTime.now(), "welcome");
 
         Executable initializeSubmit = () -> surveyService.initializeSubmit("nonValidToken", "someSessionId", LocalDateTime.now());
 
@@ -65,7 +65,7 @@ public class SurveyServiceTests {
     public void addFactorToSubmit() throws InvalidTokenException, InvalidSessionException {
         String someSessionId = "id123";
         Survey survey = surveyService.startNewSurvey("test", false);
-        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now());
+        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now(), "welcome");
         Submit savedSubmit = surveyService.initializeSubmit(survey.getToken(), someSessionId, LocalDateTime.now());
         Map<String, Impact> impacts = new HashMap<>();
         impacts.put("reliability", new Impact("reliability", 2));
@@ -85,7 +85,7 @@ public class SurveyServiceTests {
     public void updateFactorShouldChangeUpdateTimestampOnly() throws InvalidTokenException, InvalidSessionException, InterruptedException {
         String someSessionId = "id123";
         Survey survey = surveyService.startNewSurvey("test", false);
-        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now());
+        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now(), "welcome");
         Submit savedSubmit = surveyService.initializeSubmit(survey.getToken(), someSessionId, LocalDateTime.now());
         Map<String, Impact> impacts = new HashMap<>();
         impacts.put("reliability", new Impact("reliability", 2));
@@ -133,7 +133,7 @@ public class SurveyServiceTests {
 
         String someSessionId = "id123";
         Survey survey = surveyService.startNewSurvey("test", true);
-        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now());
+        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now(), "welcome");
         Submit savedSubmit = surveyService.initializeSubmit(survey.getToken(), someSessionId, LocalDateTime.now());
 
         Submit updatedSubmit = surveyService.submitPilotFeedback(survey.getToken(), someSessionId, feedback);
@@ -162,7 +162,7 @@ public class SurveyServiceTests {
 
         String someSessionId = "id123";
         Survey survey = surveyService.startNewSurvey("test", false);
-        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now());
+        Submit newSubmit = new Submit(someSessionId, LocalDateTime.now(), LocalDateTime.now(), "welcome");
         Submit savedSubmit = surveyService.initializeSubmit(survey.getToken(), someSessionId, LocalDateTime.now());
 
         Executable tryToSubmitFeedback = () -> surveyService.submitPilotFeedback(survey.getToken(), someSessionId, feedback);

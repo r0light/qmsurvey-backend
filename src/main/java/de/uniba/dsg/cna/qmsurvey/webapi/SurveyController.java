@@ -1,5 +1,6 @@
 package de.uniba.dsg.cna.qmsurvey.webapi;
 
+import de.uniba.dsg.cna.qmsurvey.application.InvalidClientStatusException;
 import de.uniba.dsg.cna.qmsurvey.application.InvalidSessionException;
 import de.uniba.dsg.cna.qmsurvey.application.InvalidTokenException;
 import de.uniba.dsg.cna.qmsurvey.application.SurveyService;
@@ -45,10 +46,38 @@ public class SurveyController {
         try {
             Submit submit = surveyService.initializeSubmit(newSubmit.getToken(), newSubmit.getSessionId(), newSubmit.getClientStartTime());
             boolean isPilot = surveyService.isPilot(newSubmit.getToken());
-            return EntityModel.of(SubmitDto.of(newSubmit.getToken(), submit.getSessionId(), submit.getClientStartTime(), isPilot), linkTo(methodOn(SurveyController.class)
-                    .submitFactors(newSubmit.getSessionId(), new FactorCollectionDto())).withRel("submitFactors"));
+            return EntityModel.of(SubmitDto.of(newSubmit.getToken(), submit.getSessionId(), submit.getClientStartTime(), submit.getLastState(), isPilot),
+                    linkTo(methodOn(SurveyController.class).updateClientStateForSubmit(newSubmit.getSessionId(), new StateUpdateDto())).withRel("updateClientState"),
+                    linkTo(methodOn(SurveyController.class).submitFactors(newSubmit.getSessionId(), new FactorCollectionDto())).withRel("submitFactors"));
         } catch (InvalidTokenException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "There is currently no survey for this token.");
+        }
+    }
+
+    @Operation(summary = "update last client state with a sessionId for a survey identified by a token")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "The new last state has been saved.",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = SubmitDto.class))}),
+            @ApiResponse(responseCode = "400", description = "Invalid data has been provided for the request",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404", description = "There is currently no survey for this token.",
+                    content = {@Content(mediaType = "application/json")})
+    })
+    @PutMapping(value = "{sessionId}/clientstate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public EntityModel<SubmitDto> updateClientStateForSubmit(@PathVariable String sessionId, @RequestBody @Valid StateUpdateDto stateUpdate) {
+        try {
+            Submit submit = surveyService.updateLastClientState(stateUpdate.getToken(), sessionId, stateUpdate.getLastState());
+            boolean isPilot = surveyService.isPilot(stateUpdate.getToken());
+            return EntityModel.of(SubmitDto.of(stateUpdate.getToken(), submit.getSessionId(), submit.getClientStartTime(), submit.getLastState(), isPilot),
+                    linkTo(methodOn(SurveyController.class).updateClientStateForSubmit(submit.getSessionId(), new StateUpdateDto())).withRel("updateClientState"),
+                    linkTo(methodOn(SurveyController.class).submitFactors(submit.getSessionId(), new FactorCollectionDto())).withRel("submitFactors"));
+        } catch (InvalidTokenException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "There is currently no survey for this token.");
+        } catch (InvalidSessionException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No session with this id has been started yet");
+        } catch (InvalidClientStatusException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot set this status");
         }
     }
 

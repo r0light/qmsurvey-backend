@@ -21,17 +21,20 @@ public class SubmitMongoEntity {
     private ObjectId surveyId;
     private LocalDateTime startTime;
     private LocalDateTime clientStartTime;
+
+    private String lastState;
     private Map<String, Factor> factors;
     private Demographics demographics;
 
     private PilotFeedback pilotFeedback;
 
-    public SubmitMongoEntity(ObjectId id, String sessionId, ObjectId surveyId, LocalDateTime startTime, LocalDateTime clientStartTime, Map<String, Factor> factors, Demographics demographics, PilotFeedback pilotFeedback) {
+    public SubmitMongoEntity(ObjectId id, String sessionId, ObjectId surveyId, LocalDateTime startTime, LocalDateTime clientStartTime, String lastState,  Map<String, Factor> factors, Demographics demographics, PilotFeedback pilotFeedback) {
         this.id = id;
         this.sessionId = sessionId;
         this.surveyId = surveyId;
         this.startTime = startTime;
         this.clientStartTime = clientStartTime;
+        this.lastState = lastState;
         this.factors = factors;
         this.demographics = demographics;
         this.pilotFeedback = pilotFeedback;
@@ -39,11 +42,14 @@ public class SubmitMongoEntity {
 
     static SubmitMongoEntity of(Submit submit, Survey survey) {
         ObjectId submitId = submit.getId() == null ? new ObjectId() : new ObjectId(submit.getId());
-        return new SubmitMongoEntity(submitId, submit.getSessionId(), new ObjectId(survey.getId()),  submit.getStartTime(), submit.getClientStartTime(), submit.getFactors(), submit.getDemographics(), submit.getPilotFeedback());
+        return new SubmitMongoEntity(submitId, submit.getSessionId(), new ObjectId(survey.getId()),  submit.getStartTime(), submit.getClientStartTime(), submit.getLastState(), submit.getFactors(), submit.getDemographics(), submit.getPilotFeedback());
     }
 
     Submit toDomainObject() {
-        return new Submit(id.toHexString(), sessionId, startTime, clientStartTime, factors, demographics ,pilotFeedback);
+        if (lastState == null || lastState.isEmpty()) {
+            lastState = "unknown";
+        }
+        return new Submit(id.toHexString(), sessionId, startTime, clientStartTime, lastState, factors, demographics ,pilotFeedback);
     }
 
     public ObjectId getId() {

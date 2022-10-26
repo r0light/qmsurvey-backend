@@ -18,6 +18,8 @@ public class SurveyService {
 
     private static final ZoneId EUROPE_TZ = ZoneId.of(ZoneId.SHORT_IDS.get("ECT"));
 
+    private static final List<String> CLIENT_STATE = List.of("unknown", "welcome", "example", "selection", "overview", "question", "demographics", "done");
+
     @Autowired
     private SurveyPort surveyPort;
 
@@ -107,12 +109,31 @@ public class SurveyService {
             return foundSubmit.get();
         } else {
             LocalDateTime submitStart = LocalDateTime.now(EUROPE_TZ);
-            Submit initialSubmit = new Submit(sessionId, submitStart, clientStartTime);
+            Submit initialSubmit = new Submit(sessionId, submitStart, clientStartTime, "welcome");
 
             Submit newSubmit = surveyPort.saveSubmit(survey, initialSubmit);
 
             return newSubmit;
         }
+    }
+
+    public Submit updateLastClientState(String token, String sessionId, String lastState) throws InvalidSessionException, InvalidTokenException, InvalidClientStatusException {
+        Survey survey = validateSurvey(token);
+        Submit submit = validateSubmit(sessionId);
+
+        int newLastState = CLIENT_STATE.indexOf(lastState);
+        if (newLastState == -1) {
+            throw new InvalidClientStatusException("This is not valid client state");
+        }
+
+        int currentLastState = CLIENT_STATE.indexOf(submit.getLastState());
+        //only update if new state is further than the current
+        if (newLastState > currentLastState) {
+            submit.setLastState(lastState);
+        }
+
+        Submit updatedSubmit = surveyPort.saveSubmit(survey, submit);
+        return updatedSubmit;
     }
 
     public Submit submitFactors(String token, String sessionId, List<Factor> factors) throws InvalidSessionException, InvalidTokenException {
