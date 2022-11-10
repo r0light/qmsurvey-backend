@@ -50,14 +50,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
             http
                     .csrf().disable()
-                    .antMatcher("/api/**")
                     .authorizeRequests()
-                    .antMatchers(HttpMethod.POST, "/api/submit")
+                    .antMatchers(HttpMethod.OPTIONS, "/**")
                     .permitAll()
                     .antMatchers(HttpMethod.GET,  "/api/v3/api-docs",
-                                            "/api/v3/api-docs/*",
-                                            "/api/swagger-ui",
-                                            "/api/swagger-ui/*").permitAll();
+                            "/api/v3/api-docs/*",
+                            "/api/swagger-ui",
+                            "/api/swagger-ui/*",
+                            "/api/api-docs",
+                            "/api/api-docs/*").permitAll()
+                    .antMatchers(HttpMethod.PUT,"/api/*/clientstate")
+                    .permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/submit", "/api/*/factors", "/api/*/feedback", "/api/*/demographics", "/api/*/contact")
+                    .permitAll()
+                    .antMatchers("/api/**")
+                    .authenticated();
         }
     }
 

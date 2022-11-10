@@ -59,4 +59,3 @@ docker run -it -p 8080:8080 --rm --name qmsurvey-backend --link mongodb:mongodb 
     --env QMSURVEY_DATA_MONGODB_PASSWORD=69kxLBsK60WX8lH3DMgY \
      rlight/qmsurvey-backend:latest
 ```
-

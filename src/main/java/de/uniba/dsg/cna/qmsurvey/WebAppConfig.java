@@ -27,7 +27,7 @@ public class WebAppConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        CorsRegistration registration = registry.addMapping("/**");
+        CorsRegistration registration = registry.addMapping("/**").allowedMethods("HEAD", "GET", "POST", "PUT", "OPTIONS");
         registration.allowedOrigins(clientHost);
     }
 
