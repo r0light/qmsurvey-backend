@@ -63,19 +63,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                     .antMatchers(HttpMethod.POST, "/api/submit", "/api/*/factors", "/api/*/feedback", "/api/*/demographics", "/api/*/contact")
                     .permitAll()
-                    .antMatchers("/api/**")
-                    .authenticated();
-        }
-    }
-
-    @Configuration
-    @Order(2)
-    public class WebAppSecurityConfig extends WebSecurityConfigurerAdapter {
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http
-                    .authorizeRequests()
                     .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                     .antMatchers( "/admin/signin", "/fonts/**", "/favicon.ico").permitAll()
                     .anyRequest().authenticated()
@@ -96,6 +83,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .key("remember-me-key");
         }
     }
+
 
     @Bean(name = "authenticationManager")
     @Override
